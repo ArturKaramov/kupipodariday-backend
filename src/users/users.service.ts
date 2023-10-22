@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -33,8 +32,8 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id + updateUserDto.about} user`;
+  update(id: number) {
+    return `This action updates a #${id} user`;
   }
 
   remove(id: number) {
