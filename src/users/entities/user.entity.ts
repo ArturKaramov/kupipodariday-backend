@@ -17,15 +17,12 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @Column({ unique: true })
   @Length(2, 30)
   username: string;
+
+  @Column()
+  password: string;
 
   @Column({ default: 'Пока ничего не рассказал о себе' })
   @Length(2, 200)
@@ -37,8 +34,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @OneToMany(() => Wish, (wish) => wish.owner)
   wishes: Wish[];

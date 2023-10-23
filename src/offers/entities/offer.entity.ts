@@ -20,15 +20,15 @@ export class Offer {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => User, (user) => user.offers)
-  user: User[];
-  /*
-  @Column()
+  @ManyToMany(() => Wish, (wish) => wish.offers)
   item: Wish;
-*/
+
   @Column()
   amount: number;
 
   @Column({ default: false })
   hidden: boolean;
+
+  @ManyToMany(() => User, (user) => user.offers)
+  user: User[];
 }

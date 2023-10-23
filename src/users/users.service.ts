@@ -19,17 +19,22 @@ export class UsersService {
     return this.usersRepository.save(createUserDto);
   }
 
+  findByUsername(username: string): Promise<User> {
+    return this.usersRepository.findOneBy({ username });
+  }
+
   findOne(id: number) {
     const user = this.usersRepository.findOneBy({ id });
     return user;
   }
 
-  findByUsername(username: string): Promise<User> {
-    return this.usersRepository.findOneBy({ username });
-  }
-
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
+  }
+
+  findMe(user: User) {
+    delete user.password;
+    return user;
   }
 
   update(id: number) {

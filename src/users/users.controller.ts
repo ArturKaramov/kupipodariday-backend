@@ -1,15 +1,17 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
 import { HashService } from 'src/hash/hash.service';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('users')
 export class UsersController {
@@ -18,19 +20,17 @@ export class UsersController {
     private readonly hashService: HashService,
   ) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @UseGuards(JwtGuard)
+  @HttpCode(200)
+  @Get('me')
+  GetMe(@Req() req: Request & { user: User }) {
+    delete req.user.password;
+    return req.user;
   }
 
   @Get()
   findAll() {
     return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
   }
 
   @Patch(':id')

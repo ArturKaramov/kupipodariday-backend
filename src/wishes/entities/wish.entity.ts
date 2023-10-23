@@ -7,7 +7,7 @@ import {
   ManyToOne,
   ManyToMany,
 } from 'typeorm';
-import { Length } from 'class-validator';
+import { IsUrl, Length } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 
 @Entity()
@@ -26,6 +26,7 @@ export class Wish {
   name: string;
 
   @Column()
+  @IsUrl()
   link: string;
 
   @Column()
@@ -37,16 +38,16 @@ export class Wish {
   @Column()
   raised: number;
 
-  @ManyToOne(() => User, (user) => user.wishes)
-  owner: User;
+  @Column()
+  copied: number;
 
   @Column()
   @Length(1, 1024)
   description: string;
-  /*
+
+  @ManyToOne(() => User, (user) => user.wishes)
+  owner: User;
+
   @ManyToMany(() => User, (user) => user.offers)
   offers: User[];
-*/
-  @Column()
-  copied: number;
 }

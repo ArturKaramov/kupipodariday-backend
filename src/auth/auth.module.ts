@@ -4,23 +4,20 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { HashModule } from 'src/hash/hash.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import config from 'src/config';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     HashModule,
-    TypeOrmModule.forFeature([User]),
-    ConfigModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      imports: [ConfigModule.forRoot({ load: [config] })],
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('jwt_secret'),
       }),
       inject: [ConfigService],

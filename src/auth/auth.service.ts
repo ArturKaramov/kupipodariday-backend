@@ -12,11 +12,10 @@ export class AuthService {
     private readonly hashService: HashService,
   ) {}
 
-  auth(user: User) {
+  auth(user: User): { access_token: string } {
     const payload = { sub: user.id };
-    const token = this.jwtService.sign(payload);
 
-    return { access_token: token };
+    return { access_token: this.jwtService.sign(payload) };
   }
 
   async validateUser(username: string, password: string): Promise<any> {
