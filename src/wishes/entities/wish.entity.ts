@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { IsUrl, Length } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
@@ -35,10 +36,10 @@ export class Wish {
   @Column()
   price: number;
 
-  @Column()
+  @Column({ default: 0 })
   raised: number;
 
-  @Column()
+  @Column({ default: 0 })
   copied: number;
 
   @Column()
@@ -49,5 +50,6 @@ export class Wish {
   owner: User;
 
   @ManyToMany(() => User, (user) => user.offers)
+  @JoinTable()
   offers: User[];
 }

@@ -6,13 +6,15 @@ import {
   Delete,
   Req,
   UseGuards,
-  HttpCode,
+  Body,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { HashService } from 'src/hash/hash.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
 
+@UseGuards(JwtGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -20,8 +22,6 @@ export class UsersController {
     private readonly hashService: HashService,
   ) {}
 
-  @UseGuards(JwtGuard)
-  @HttpCode(200)
   @Get('me')
   GetMe(@Req() req: Request & { user: User }) {
     delete req.user.password;
@@ -31,6 +31,29 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Patch('me')
+  updateMe(
+    @Req() req: Request & { user: User },
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.updateMe(req.user.id, updateUserDto);
+  }
+
+  @Get('me/wishes')
+  getMyWishes(@Req() req: Request & { user: User }) {
+    return this.usersService.getMyWishes(req.user.id);
+  }
+
+  @Get(':username')
+  getUser(@Param('username') username: string) {
+    return this.usersService.findByUsername(username);
+  }
+
+  @Get(':username/wishes')
+  getUserWishes(@Param('username') username: string) {
+    return this.usersService.getUserWishes(username);
   }
 
   @Patch(':id')
