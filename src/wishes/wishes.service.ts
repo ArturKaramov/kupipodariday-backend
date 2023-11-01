@@ -4,18 +4,16 @@ import { Repository } from 'typeorm';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { Wish } from './entities/wish.entity';
-import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
   constructor(
     @InjectRepository(Wish)
     private readonly wishesRepository: Repository<Wish>,
-    private readonly usersService: UsersService,
   ) {}
 
-  async create(id: number, createWishDto: CreateWishDto) {
-    const user = await this.usersService.findOne(id);
+  async create(user: User, createWishDto: CreateWishDto) {
     return await this.wishesRepository.save({
       ...createWishDto,
       owner: user,
@@ -37,7 +35,10 @@ export class WishesService {
   }
 
   async findOne(id: number) {
-    return await this.wishesRepository.findOneBy({ id });
+    return await this.wishesRepository.findOne({
+      where: { id },
+      relations: { owner: true },
+    });
   }
 
   async update(id: number, updateWishDto: UpdateWishDto) {
@@ -49,7 +50,14 @@ export class WishesService {
     await this.wishesRepository.remove(await this.findOne(id));
   }
 
-  findAll() {
-    return `This action returns all wishes`;
+  async copy(id: number, user: User) {
+    const wish = await this.wishesRepository.findOneBy({ id });
+    delete wish.id;
+    delete wish.createdAt;
+    delete wish.updatedAt;
+    delete wish.offers;
+    delete wish.raised;
+    this.wishesRepository.update(id, { copied: wish.copied++ });
+    return await this.create(user, wish);
   }
 }

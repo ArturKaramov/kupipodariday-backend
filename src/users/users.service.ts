@@ -20,46 +20,39 @@ export class UsersService {
     return await this.usersRepository.save(createUserDto);
   }
 
-  async findByUsername(username: string): Promise<User> {
-    return await this.usersRepository.findOneBy({ username });
+  findByUsername(username: string): Promise<User> {
+    return this.usersRepository.findOneBy({ username });
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
-    delete user.password;
-    return user;
+    return await this.usersRepository.findOneBy({ id });
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.find();
   }
 
   async updateMe(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    if (updateUserDto.password) {
+      const hashed = await this.hashService.hash(updateUserDto.password);
+      updateUserDto.password = hashed;
+    }
     await this.usersRepository.update(id, updateUserDto);
     return await this.findOne(id);
-  }
-
-  async getMyWishes(id: number) {
-    const user = await this.usersRepository.findOne({
-      where: { id },
-      relations: { wishes: true },
-    });
-    return user.wishes;
   }
 
   async getUserWishes(username: string) {
     const user = await this.usersRepository.findOne({
       where: { username },
-      relations: { wishes: true },
+      relations: ['wishes', 'wishes.owner', 'wishes.offers'],
     });
     return user.wishes;
   }
 
-  update(id: number) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findMany(query: string) {
+    const users = await this.usersRepository.find({
+      where: [{ email: query }, { username: query }],
+    });
+    return users;
   }
 }

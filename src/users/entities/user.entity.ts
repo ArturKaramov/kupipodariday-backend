@@ -21,7 +21,7 @@ export class User {
   @Length(2, 30)
   username: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({ default: 'Пока ничего не рассказал о себе' })

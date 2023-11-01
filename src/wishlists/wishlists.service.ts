@@ -1,26 +1,66 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { Wishlist } from './entities/wishlist.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { WishesService } from 'src/wishes/wishes.service';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Injectable()
 export class WishlistsService {
-  create(createWishlistDto: CreateWishlistDto) {
-    return 'This action adds a new wishlist';
+  constructor(
+    @InjectRepository(Wishlist)
+    private readonly wishlistRepository: Repository<Wishlist>,
+    private readonly wishesService: WishesService,
+  ) {}
+
+  async create(createWishlistDto: CreateWishlistDto, user: User) {
+    const { name, image, itemsId } = createWishlistDto;
+    const items: Wish[] = await Promise.all(
+      itemsId.map(async (item): Promise<Wish> => {
+        return await this.wishesService.findOne(item);
+      }),
+    );
+
+    return await this.wishlistRepository.save({
+      name,
+      image,
+      items,
+      owner: user,
+    });
   }
 
-  findAll() {
-    return `This action returns all wishlists`;
+  async findAll() {
+    return await this.wishlistRepository.find({
+      relations: { owner: true, items: true },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wishlist`;
+  async findOne(id: number) {
+    return await this.wishlistRepository.findOne({
+      where: { id },
+      relations: { owner: true, items: true },
+    });
   }
 
-  update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return `This action updates a #${id} wishlist`;
+  async update(id: number, updateWishlistDto: UpdateWishlistDto) {
+    const { itemsId, ...rest } = updateWishlistDto;
+    if (itemsId) {
+      const items: Wish[] = await Promise.all(
+        itemsId.map(async (item): Promise<Wish> => {
+          return await this.wishesService.findOne(item);
+        }),
+      );
+      await this.wishlistRepository.update(id, { ...rest, items: items });
+    } else {
+      await this.wishlistRepository.update(id, rest);
+    }
+    return await this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wishlist`;
+  async remove(id: number) {
+    return await this.wishlistRepository.remove(await this.findOne(id));
   }
 }

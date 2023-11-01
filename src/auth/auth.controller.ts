@@ -11,6 +11,8 @@ import { UsersService } from 'src/users/users.service';
 import { LocalGuard } from './guards/local.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from 'src/users/entities/user.entity';
+import { ServerException } from 'src/exceptions/server.exceptions';
+import { ErrorCode } from 'src/exceptions/error-codes';
 
 @Controller()
 export class AuthController {
@@ -21,14 +23,22 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto);
-    return this.authService.auth(user);
+    const existingUser = await this.usersService.findByUsername(
+      createUserDto.username,
+    );
+    const existingEmail = await this.usersService.findMany(createUserDto.email);
+    if (existingUser || existingEmail.length > 0) {
+      throw new ServerException(ErrorCode.UserAlreadyExists);
+    } else {
+      const user = await this.usersService.create(createUserDto);
+      return this.authService.auth(user);
+    }
   }
 
   @UseGuards(LocalGuard)
   @HttpCode(200)
   @Post('signin')
-  async signin(@Req() req: Request & { user: User }) {
+  signin(@Req() req: Request & { user: User }) {
     return this.authService.auth(req.user);
   }
 }

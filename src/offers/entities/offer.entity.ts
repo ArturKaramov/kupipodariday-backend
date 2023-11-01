@@ -4,7 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
+  ManyToOne,
 } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
@@ -20,7 +20,7 @@ export class Offer {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => Wish, (wish) => wish.offers)
+  @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish;
 
   @Column()
@@ -29,6 +29,6 @@ export class Offer {
   @Column({ default: false })
   hidden: boolean;
 
-  @ManyToMany(() => User, (user) => user.offers)
-  user: User[];
+  @ManyToOne(() => User)
+  user: User;
 }

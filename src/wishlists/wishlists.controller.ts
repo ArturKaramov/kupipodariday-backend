@@ -6,18 +6,28 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { User } from 'src/users/entities/user.entity';
 import { WishlistsService } from './wishlists.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { ServerException } from 'src/exceptions/server.exceptions';
+import { ErrorCode } from 'src/exceptions/error-codes';
 
-@Controller('wishlists')
+@UseGuards(JwtGuard)
+@Controller('wishlistlists')
 export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
 
   @Post()
-  create(@Body() createWishlistDto: CreateWishlistDto) {
-    return this.wishlistsService.create(createWishlistDto);
+  create(
+    @Body() createWishlistDto: CreateWishlistDto,
+    @Req() req: Request & { user: User },
+  ) {
+    return this.wishlistsService.create(createWishlistDto, req.user);
   }
 
   @Get()
@@ -26,20 +36,30 @@ export class WishlistsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.wishlistsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const wishlist = await this.wishlistsService.findOne(+id);
+    if (!wishlist) {
+      throw new ServerException(ErrorCode.WishlistNotFound);
+    } else return wishlist;
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateWishlistDto: UpdateWishlistDto,
+    @Req() req: Request & { user: User },
   ) {
-    return this.wishlistsService.update(+id, updateWishlistDto);
+    const wishlist = await this.findOne(id);
+    if (wishlist.owner.id !== req.user.id) {
+      throw new ServerException(ErrorCode.Forbidden);
+    } else return this.wishlistsService.update(+id, updateWishlistDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wishlistsService.remove(+id);
+  async remove(@Param('id') id: string, @Req() req: Request & { user: User }) {
+    const wishlist = await this.findOne(id);
+    if (wishlist.owner.id !== req.user.id) {
+      throw new ServerException(ErrorCode.Forbidden);
+    } else return this.wishlistsService.remove(+id);
   }
 }
