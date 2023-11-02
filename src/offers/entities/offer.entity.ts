@@ -23,7 +23,7 @@ export class Offer {
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
   amount: number;
 
   @Column({ default: false })
