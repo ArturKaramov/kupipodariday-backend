@@ -1,4 +1,4 @@
-import { Length, Min, IsUrl, IsOptional } from 'class-validator';
+import { Length, IsNumber, IsUrl, IsOptional } from 'class-validator';
 
 export class UpdateWishDto {
   @IsOptional()
@@ -14,7 +14,7 @@ export class UpdateWishDto {
   image: string;
 
   @IsOptional()
-  @Min(1)
+  @IsNumber()
   price: number;
 
   @IsOptional()

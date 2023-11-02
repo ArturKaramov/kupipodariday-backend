@@ -17,8 +17,8 @@ export class OffersService {
   async create(user: User, createOfferDto: CreateOfferDto) {
     const { itemId, ...rest } = createOfferDto;
     const item = await this.wishesService.findOne(itemId);
-    item.raised += createOfferDto.amount;
-    await this.wishesService.update(itemId, { ...item });
+    item.raised += +Number(createOfferDto.amount).toFixed(2);
+    await this.wishesService.raise(itemId, { raised: item.raised });
     return await this.offersRepository.save({ ...rest, user, item });
   }
 

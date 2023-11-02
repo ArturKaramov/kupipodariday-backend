@@ -8,7 +8,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { IsUrl, Length, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsUrl, Length, Min } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 
 @Entity()
@@ -34,10 +34,13 @@ export class Wish {
   image: string;
 
   @Min(1)
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @IsNotEmpty()
+  @Column({ type: 'float', scale: 2 })
+  @IsNumber()
   price: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'float', scale: 2, default: 0 })
+  @IsNumber()
   raised: number;
 
   @Column({ default: 0 })

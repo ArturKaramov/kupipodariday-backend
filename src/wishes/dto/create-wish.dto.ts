@@ -1,4 +1,4 @@
-import { Length, Min, IsUrl, IsOptional } from 'class-validator';
+import { Length, IsNumber, IsUrl, IsOptional } from 'class-validator';
 
 export class CreateWishDto {
   @Length(1, 250)
@@ -10,7 +10,7 @@ export class CreateWishDto {
   @IsUrl()
   image: string;
 
-  @Min(1)
+  @IsNumber()
   price: number;
 
   @IsOptional()

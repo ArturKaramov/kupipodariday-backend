@@ -46,8 +46,13 @@ export class WishesService {
     return await this.findOne(id);
   }
 
+  async raise(id: number, amount: { raised: number }) {
+    await this.wishesRepository.update(id, amount);
+    return await this.findOne(id);
+  }
+
   async remove(id: number) {
-    await this.wishesRepository.remove(await this.findOne(id));
+    await this.wishesRepository.delete(id);
   }
 
   async copy(id: number, user: User) {
