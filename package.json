@@ -1,8 +1,8 @@
 {
   "name": "kupipodariday",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Backend of KupiPodariDay project",
+  "author": "Artur Karamov",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
