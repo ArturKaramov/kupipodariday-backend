@@ -13,49 +13,49 @@ export class WishesService {
     private readonly wishesRepository: Repository<Wish>,
   ) {}
 
-  async create(user: User, createWishDto: CreateWishDto) {
+  async create(user: User, createWishDto: CreateWishDto): Promise<Wish> {
     return await this.wishesRepository.save({
       ...createWishDto,
       owner: user,
     });
   }
 
-  async getLast() {
+  async getLast(): Promise<Wish[]> {
     return await this.wishesRepository.find({
       order: { createdAt: 'desc' },
       take: 40,
     });
   }
 
-  async getTop() {
+  async getTop(): Promise<Wish[]> {
     return await this.wishesRepository.find({
       order: { copied: 'asc' },
       take: 20,
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Wish> {
     return await this.wishesRepository.findOne({
       where: { id },
       relations: { owner: true },
     });
   }
 
-  async update(id: number, updateWishDto: UpdateWishDto) {
+  async update(id: number, updateWishDto: UpdateWishDto): Promise<Wish> {
     await this.wishesRepository.update(id, updateWishDto);
     return await this.findOne(id);
   }
 
-  async raise(id: number, amount: { raised: number }) {
+  async raise(id: number, amount: { raised: number }): Promise<Wish> {
     await this.wishesRepository.update(id, amount);
     return await this.findOne(id);
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     await this.wishesRepository.delete(id);
   }
 
-  async copy(id: number, user: User) {
+  async copy(id: number, user: User): Promise<Wish> {
     const wish = await this.wishesRepository.findOneBy({ id });
     delete wish.id;
     delete wish.createdAt;

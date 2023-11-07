@@ -22,7 +22,9 @@ export class AuthController {
   ) {}
 
   @Post('signup')
-  async signup(@Body() createUserDto: CreateUserDto) {
+  async signup(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<{ access_token: string }> {
     const existingUser = await this.usersService.findByUsername(
       createUserDto.username,
     );
@@ -38,7 +40,7 @@ export class AuthController {
   @UseGuards(LocalGuard)
   @HttpCode(200)
   @Post('signin')
-  signin(@Req() req: Request & { user: User }) {
+  signin(@Req() req: Request & { user: User }): { access_token: string } {
     return this.authService.auth(req.user);
   }
 }

@@ -1,27 +1,10 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import { BaseEntity } from 'src/base-entity/base.entity';
 import { IsNotEmpty, IsNumber, IsUrl, Length, Min } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 
 @Entity()
-export class Wish {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
+export class Wish extends BaseEntity {
   @Column()
   @Length(1, 250)
   name: string;

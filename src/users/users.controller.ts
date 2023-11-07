@@ -14,6 +14,7 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ServerException } from 'src/exceptions/server.exceptions';
 import { ErrorCode } from 'src/exceptions/error-codes';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 @UseGuards(JwtGuard)
 @Controller('users')
@@ -21,12 +22,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  GetMe(@Req() req: Request & { user: User }) {
+  GetMe(@Req() req: Request & { user: User }): User {
     return req.user;
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
@@ -34,17 +35,17 @@ export class UsersController {
   updateMe(
     @Req() req: Request & { user: User },
     @Body() updateUserDto: UpdateUserDto,
-  ) {
+  ): Promise<User> {
     return this.usersService.updateMe(req.user.id, updateUserDto);
   }
 
   @Get('me/wishes')
-  getMyWishes(@Req() req: Request & { user: User }) {
+  getMyWishes(@Req() req: Request & { user: User }): Promise<Wish[]> {
     return this.usersService.getUserWishes(req.user.username);
   }
 
   @Get(':username')
-  async getUser(@Param('username') username: string) {
+  async getUser(@Param('username') username: string): Promise<User> {
     const user = await this.usersService.findByUsername(username);
     if (!user) {
       throw new ServerException(ErrorCode.UserNotFound);
@@ -54,7 +55,7 @@ export class UsersController {
   }
 
   @Get(':username/wishes')
-  async getUserWishes(@Param('username') username: string) {
+  async getUserWishes(@Param('username') username: string): Promise<Wish[]> {
     const user = this.getUser(username);
     if (!user) {
       throw new ServerException(ErrorCode.UserNotFound);
@@ -64,7 +65,7 @@ export class UsersController {
   }
 
   @Post('find')
-  async find(@Body('query') query: string) {
+  async find(@Body('query') query: string): Promise<User[]> {
     const users = await this.usersService.findMany(query);
     if (!users) {
       throw new ServerException(ErrorCode.UserNotFound);

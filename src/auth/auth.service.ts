@@ -18,7 +18,7 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.usersService.findByUsernameWithPassword(username);
 
     if (!user) {
@@ -27,6 +27,7 @@ export class AuthService {
       const matched = await this.hashService.compare(password, user.password);
 
       if (matched) {
+        delete user.password;
         return user;
       } else {
         return null;

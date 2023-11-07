@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { HashService } from 'src/hash/hash.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Injectable()
 export class UsersService {
@@ -50,7 +51,7 @@ export class UsersService {
     return await this.findOne(id);
   }
 
-  async getUserWishes(username: string) {
+  async getUserWishes(username: string): Promise<Wish[]> {
     const user = await this.usersRepository.findOne({
       where: { username },
       relations: ['wishes', 'wishes.owner', 'wishes.offers'],
@@ -58,7 +59,7 @@ export class UsersService {
     return user.wishes;
   }
 
-  async findMany(query: string) {
+  async findMany(query: string): Promise<User[]> {
     const users = await this.usersRepository.find({
       where: [{ email: query }, { username: query }],
     });

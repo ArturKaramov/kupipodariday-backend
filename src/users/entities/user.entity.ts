@@ -1,22 +1,12 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  ManyToMany,
-} from 'typeorm';
+import { Entity, Column, OneToMany, ManyToMany } from 'typeorm';
+import { BaseEntity } from 'src/base-entity/base.entity';
 import { Length } from 'class-validator';
 import { Wish } from 'src/wishes/entities/wish.entity';
 import { Offer } from 'src/offers/entities/offer.entity';
 import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class User extends BaseEntity {
   @Column({ unique: true })
   @Length(2, 30)
   username: string;
@@ -33,12 +23,6 @@ export class User {
 
   @Column({ unique: true })
   email: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @OneToMany(() => Wish, (wish) => wish.owner)
   wishes: Wish[];
